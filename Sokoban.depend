@@ -1,7 +1,8 @@
 # depslib dependency file v1.0
-1566641408 source:c:\users\tom\programming\sokoban\main.cpp
+1566642123 source:c:\users\tom\programming\sokoban\main.cpp
 	<iostream>
 	<Game.h>
+	<Configuration.h>
 
 1566641319 c:\users\tom\programming\sokoban\include\game.h
 	<TGUI/TGUI.hpp>

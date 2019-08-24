@@ -1,0 +1,90 @@
+Renderer.1 {
+    backgroundcolor = #F5F5F5;
+    backgroundcolordisabled = #E6E6E6;
+    backgroundcolordown = #EBEBEB;
+    backgroundcolorhover = white;
+    bordercolor = #3C3C3C;
+    bordercolordisabled = #7D7D7D;
+    bordercolordown = black;
+    bordercolorfocused = #1E1EB4;
+    bordercolorhover = black;
+    borders = (1, 1, 1, 1);
+    textcolor = #3C3C3C;
+    textcolordisabled = #7D7D7D;
+    textcolordown = black;
+    textcolorhover = black;
+    texture = None;
+    texturedisabled = None;
+    texturedown = None;
+    texturefocused = None;
+    texturehover = None;
+}
+
+Picture.Picture1 {
+    Size = (800, 600);
+
+    Renderer {
+        texture = "resources\\Menus\\BG.png";
+        transparenttexture = false;
+    }
+}
+
+ListBox.lstLevel {
+    ItemHeight = 20;
+    MaximumItems = 0;
+    Position = (360, 190);
+    Size = (400, 142);
+    TextSize = 13;
+
+    Renderer {
+        backgroundcolor = #F5F5F5;
+        backgroundcolorhover = white;
+        bordercolor = black;
+        borders = (1, 1, 1, 1);
+        padding = (0, 0, 0, 0);
+        selectedbackgroundcolor = #006EFF;
+        selectedbackgroundcolorhover = #1E96FF;
+        selectedtextcolor = white;
+        textcolor = #3C3C3C;
+        textcolorhover = black;
+        texturebackground = None;
+    }
+}
+
+Label.lblChooseLevel {
+    AutoSize = true;
+    Position = (360, 160);
+    ScrollbarPolicy = Never;
+    Size = (90.2, 18);
+    Text = "Choose level:";
+    TextSize = 13;
+
+    Renderer {
+        textcolor = rgb(190, 190, 190);
+
+        scrollbar {
+            texturearrowdown = "resources\\Menus\\themes\\Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+            texturearrowdownhover = "resources\\Menus\\themes\\Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+            texturearrowup = "resources\\Menus\\themes\\Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+            texturearrowuphover = "resources\\Menus\\themes\\Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+            texturethumb = "resources\\Menus\\themes\\Black.png" Part(143, 154, 20, 20);
+            texturethumbhover = "resources\\Menus\\themes\\Black.png" Part(143, 174, 20, 20);
+            texturetrack = "resources\\Menus\\themes\\Black.png" Part(123, 154, 20, 20);
+            texturetrackhover = "resources\\Menus\\themes\\Black.png" Part(123, 174, 20, 20);
+        }
+    }
+}
+
+Button.btnStartGame {
+    Position = (390, 370);
+    Text = "Start Game";
+    TextSize = 13;
+    renderer = &1;
+}
+
+Button.btnExitGame {
+    Position = (600, 370);
+    Text = "Exit Game";
+    TextSize = 13;
+    renderer = &1;
+}

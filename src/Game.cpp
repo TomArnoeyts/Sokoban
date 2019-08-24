@@ -17,7 +17,7 @@ Game::~Game()
 }
 void Game::createGui()
 {
-
+    gameMenu->loadWidgetsFromFile("resources\\Menus\\MainMenu.txt");
 }
 
 void Game::run(int frames_per_second)

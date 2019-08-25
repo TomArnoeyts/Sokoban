@@ -3,6 +3,9 @@
 #include <TGUI/TGUI.hpp>
 #include <stdio.h>
 #include <dirent.h>
+#include <iostream>
+#include <fstream>
+#include <Configuration.h>
 class Game
 {
  public:
@@ -34,6 +37,16 @@ class Game
         void parseLevel(std::string strLevelName);
 
         enum enBlockType {Empty, Wall, Box, Destination, Player};
+
+        int fieldWidth;
+        int fieldHeight;
+
+        enBlockType** fieldValues;
+
+        sf::RectangleShape bgShape;
+        sf::Sprite*** gridSprites;
+
+        float scale;
 };
 
 #endif // GAME_H

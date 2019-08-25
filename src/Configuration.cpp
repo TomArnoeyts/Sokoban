@@ -21,14 +21,14 @@ void Configuration::release()
 
 void Configuration::initTextures()
 {
-    resEntities.acquire("Player", thor::Resources::fromFile<sf::Texture>("resources/Spritesheet/Sokoban_Spritesheet.png"));
+    resEntities.acquire("Entities", thor::Resources::fromFile<sf::Texture>("resources/Spritesheet/Sokoban_Spritesheet.png"));
 }
 
 
 
 void Configuration::releaseTextures()
 {
-
+    resEntities.release("Entities");
 }
 
 

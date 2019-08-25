@@ -25,7 +25,7 @@ class Game
         void update (sf::Time deltaTime);
         void render();
 
-        enum GameState {Menu, Playing, Credits, GameOver};
+        enum GameState {Menu, Playing, Pause, Credits, GameOver};
         GameState _GameState;
 
         void createGui();
@@ -36,17 +36,31 @@ class Game
 
         void parseLevel(std::string strLevelName);
 
+        void unloadLevel();
+
         enum enBlockType {Empty, Wall, Box, Destination, Player};
 
         int fieldWidth;
         int fieldHeight;
 
         enBlockType** fieldValues;
+        enBlockType** currentFieldValues;
 
         sf::RectangleShape bgShape;
-        sf::Sprite*** gridSprites;
+        sf::Sprite*** gridSpritesGround;
+        sf::Sprite*** gridSpritesWalls;
+        sf::Sprite*** gridSpritesMoveable;
 
         float scale;
+
+        enum moveDirection {Up, Left, Down, Right};
+
+        bool moveIsAllowed(moveDirection md);
+
+        sf::Vector2i vecPlayerPosition;
+
+        sf::Sprite bigSprite;
+
 };
 
 #endif // GAME_H

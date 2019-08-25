@@ -92,6 +92,78 @@ void Game::processEvents()
         {
             case GameState::Menu:
                 gameMenu->handleEvent(event);
+            case GameState::Playing:
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    if (event.key.code==sf::Keyboard::Up)
+                    {
+                        if (moveIsAllowed(moveDirection::Up))
+                        {
+                            if (currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x-1]==enBlockType::Box)
+                                currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x-2]=enBlockType::Box;
+                            currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x-1]=enBlockType::Player;
+                            currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x]=enBlockType::Empty;
+                            vecPlayerPosition.x--;
+                        }
+
+                    }
+                    if (event.key.code==sf::Keyboard::Down)
+                    {
+                        if (moveIsAllowed(moveDirection::Down))
+                        {
+                            if (currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x+1]==enBlockType::Box)
+                                currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x+2]=enBlockType::Box;
+                            currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x+1]=enBlockType::Player;
+                            currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x]=enBlockType::Empty;
+                            vecPlayerPosition.x++;
+                        }
+                    }
+                    if (event.key.code==sf::Keyboard::Left)
+                    {
+                        if (moveIsAllowed(moveDirection::Left))
+                        {
+                            if (currentFieldValues[vecPlayerPosition.y-1][vecPlayerPosition.x]==enBlockType::Box)
+                                currentFieldValues[vecPlayerPosition.y-2][vecPlayerPosition.x]=enBlockType::Box;
+                            currentFieldValues[vecPlayerPosition.y-1][vecPlayerPosition.x]=enBlockType::Player;
+                            currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x]=enBlockType::Empty;
+                            vecPlayerPosition.y--;
+                        }
+                    }
+                    if (event.key.code==sf::Keyboard::Right)
+                    {
+                        if (moveIsAllowed(moveDirection::Right))
+                        {
+                            if (currentFieldValues[vecPlayerPosition.y+1][vecPlayerPosition.x]==enBlockType::Box)
+                                currentFieldValues[vecPlayerPosition.y+2][vecPlayerPosition.x]=enBlockType::Box;
+                            currentFieldValues[vecPlayerPosition.y+1][vecPlayerPosition.x]=enBlockType::Player;
+                            currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x]=enBlockType::Empty;
+                            vecPlayerPosition.y++;
+                        }
+                    }
+                    if (event.key.code==sf::Keyboard::Escape)
+                    {
+                        _GameState=GameState::Pause;
+                        bigSprite.setTexture(Configuration::resEntities["PauseBackground"]);
+                    }
+                }
+                break;
+            case GameState::Pause:
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    if (event.key.code==sf::Keyboard::Return)
+                    {
+                        //Reset Game:
+                        unloadLevel();
+                        _GameState=GameState::Menu;
+
+                    }
+                    if (event.key.code==sf::Keyboard::Escape)
+                    {
+
+                        _GameState=GameState::Playing;
+                    }
+                }
+                break;
             default:
                 break;
         }
@@ -110,28 +182,25 @@ void Game::update(sf::Time deltaTime)
             {
                 for (int x=0; x<fieldWidth; x++)
                 {
-                    (*gridSprites[y][x]).setTexture(Configuration::resEntities["Entities"]);
-                    (*gridSprites[y][x]).setPosition(250+x*64*scale, 50+y*64*scale);
-                    (*gridSprites[y][x]).setScale(scale, scale);
+                    (*gridSpritesMoveable[y][x]).setTexture(Configuration::resEntities["Entities"]);
+                    (*gridSpritesMoveable[y][x]).setPosition(250+y*64*scale, 50+x*64*scale);
+                    (*gridSpritesMoveable[y][x]).setScale(scale, scale);
+                    (*gridSpritesMoveable[y][x]).setTextureRect(sf::IntRect(0,0,0,0));
                     if (fieldValues[y][x]==enBlockType::Wall)
                     {
-                        (*gridSprites[y][x]).setTextureRect(sf::IntRect(384,512,64,64));
+                        (*gridSpritesWalls[y][x]).setTextureRect(sf::IntRect(384,512,64,64));
                     }
-                    if (fieldValues[y][x]==enBlockType::Empty)
+                    if (currentFieldValues[y][x]==enBlockType::Box)
                     {
-                        (*gridSprites[y][x]).setTextureRect(sf::IntRect(64,128,64,64));
+                        (*gridSpritesMoveable[y][x]).setTextureRect(sf::IntRect(0,256,64,64));
                     }
-                    if (fieldValues[y][x]==enBlockType::Box)
+                    if (currentFieldValues[y][x]==enBlockType::Destination)
                     {
-                        (*gridSprites[y][x]).setTextureRect(sf::IntRect(0,256,64,64));
+                        (*gridSpritesGround[y][x]).setTextureRect(sf::IntRect(0,64,64,64));
                     }
-                    if (fieldValues[y][x]==enBlockType::Destination)
+                    if (currentFieldValues[y][x]==enBlockType::Player)
                     {
-                        (*gridSprites[y][x]).setTextureRect(sf::IntRect(0,64,64,64));
-                    }
-                    if (fieldValues[y][x]==enBlockType::Player)
-                    {
-                        (*gridSprites[y][x]).setTextureRect(sf::IntRect(448,240,64,48));
+                        (*gridSpritesMoveable[y][x]).setTextureRect(sf::IntRect(448,240,64,48));
                     }
 
                 }
@@ -151,7 +220,9 @@ void Game::render()
     case GameState::Menu:
         gameMenu->draw();
         break;
-    case GameState::Credits:
+    case GameState::Pause:
+        _window.draw(bigSprite);
+        break;
     case GameState::GameOver:
         break;
     case GameState::Playing:
@@ -161,7 +232,9 @@ void Game::render()
         {
             for (int x=0; x<fieldWidth; x++)
             {
-                _window.draw(*gridSprites[y][x]);
+                _window.draw(*gridSpritesGround[y][x]);
+                _window.draw(*gridSpritesWalls[y][x]);
+                _window.draw(*gridSpritesMoveable[y][x]);
             }
         }
         break;
@@ -216,30 +289,50 @@ void Game::parseLevel(std::string strLevelName)
 
     fieldWidth = maxLength;
 
+    scale=(float)500/((float)(64*fieldWidth));
+    if (fieldWidth<fieldHeight)
+        scale=(float)500/((float)(64*fieldHeight));
+
     fieldValues=new enBlockType*[fieldHeight];
-    gridSprites=new sf::Sprite**[fieldHeight];
+    currentFieldValues=new enBlockType*[fieldHeight];
+    gridSpritesGround=new sf::Sprite**[fieldHeight];
+    gridSpritesWalls=new sf::Sprite**[fieldHeight];
+    gridSpritesMoveable=new sf::Sprite**[fieldHeight];
 
 
     for(int i = 0; i < fieldHeight; i++)
     {
         fieldValues[i] = new enBlockType[fieldWidth];
-        gridSprites[i] = new sf::Sprite*[fieldWidth];
+        currentFieldValues[i] = new enBlockType[fieldWidth];
+        gridSpritesGround[i] = new sf::Sprite*[fieldWidth];
+        gridSpritesWalls[i] = new sf::Sprite*[fieldWidth];
+        gridSpritesMoveable[i] = new sf::Sprite*[fieldWidth];
 
         for (int j=0; j<fieldWidth; j++)
         {
-            gridSprites[i][j]=new sf::Sprite();
-
-
+            gridSpritesGround[i][j]=new sf::Sprite();
+            (*gridSpritesGround[i][j]).setTexture(Configuration::resEntities["Entities"]);
+            (*gridSpritesGround[i][j]).setPosition(250+i*64*scale, 50+j*64*scale);
+            (*gridSpritesGround[i][j]).setScale(scale, scale);
+            (*gridSpritesGround[i][j]).setTextureRect(sf::IntRect(64,128,64,64));
+            gridSpritesWalls[i][j]=new sf::Sprite();
+            (*gridSpritesWalls[i][j]).setTexture(Configuration::resEntities["Entities"]);
+            (*gridSpritesWalls[i][j]).setPosition(250+i*64*scale, 50+j*64*scale);
+            (*gridSpritesWalls[i][j]).setTextureRect(sf::IntRect(0,0,0,0));
+            (*gridSpritesWalls[i][j]).setScale(scale, scale);
+            gridSpritesMoveable[i][j]=new sf::Sprite();
         }
     }
-    scale=(float)500/((float)(64*fieldWidth));
-    if (fieldWidth<fieldHeight)
-        scale=(float)500/((float)(64*fieldHeight));
+
 
     //scale=1;
     for (int j=0; j<fieldHeight; j++)
         for (int i=0; i<fieldWidth; i++)
+        {
             fieldValues[j][i]=enBlockType::Empty;
+            currentFieldValues[j][i]=enBlockType::Empty;
+        }
+
 
     inFile.open(strLevelName);
     int rowIndex=0;
@@ -260,7 +353,14 @@ void Game::parseLevel(std::string strLevelName)
                 if (c=='.')
                     fieldValues[rowIndex][colIndex]=enBlockType::Destination;
                 if (c=='@')
+                {
                     fieldValues[rowIndex][colIndex]=enBlockType::Player;
+                    vecPlayerPosition.x=colIndex;
+                    vecPlayerPosition.y=rowIndex;
+                }
+
+                currentFieldValues[rowIndex][colIndex]=fieldValues[rowIndex][colIndex];
+
                 colIndex++;
             }
             rowIndex++;
@@ -269,4 +369,75 @@ void Game::parseLevel(std::string strLevelName)
 
     inFile.close();
 
+}
+
+bool Game::moveIsAllowed(moveDirection md)
+{
+    if (md==moveDirection::Up)
+    {
+        if (vecPlayerPosition.x==0)
+            return false;
+        if (fieldValues[vecPlayerPosition.y][vecPlayerPosition.x-1]==enBlockType::Wall)
+            return false;
+        if (currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x-1]==enBlockType::Box)
+            if (currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x-2]==enBlockType::Box || fieldValues[vecPlayerPosition.y][vecPlayerPosition.x-2]==enBlockType::Wall)
+                return false;
+    }
+
+    if (md==moveDirection::Down)
+    {
+        if (vecPlayerPosition.x==fieldWidth-1)
+            return false;
+        if (fieldValues[vecPlayerPosition.y][vecPlayerPosition.x+1]==enBlockType::Wall)
+            return false;
+        if (currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x+1]==enBlockType::Box)
+            if (currentFieldValues[vecPlayerPosition.y][vecPlayerPosition.x+2]==enBlockType::Box || fieldValues[vecPlayerPosition.y][vecPlayerPosition.x+2]==enBlockType::Wall)
+                return false;
+    }
+
+    if (md==moveDirection::Left)
+    {
+        if (vecPlayerPosition.y==0)
+            return false;
+        if (fieldValues[vecPlayerPosition.y-1][vecPlayerPosition.x]==enBlockType::Wall)
+            return false;
+        if (currentFieldValues[vecPlayerPosition.y-1][vecPlayerPosition.x]==enBlockType::Box)
+            if (currentFieldValues[vecPlayerPosition.y-2][vecPlayerPosition.x]==enBlockType::Box || fieldValues[vecPlayerPosition.y-2][vecPlayerPosition.x]==enBlockType::Wall)
+                return false;
+    }
+
+    if (md==moveDirection::Right)
+    {
+        if (vecPlayerPosition.y==fieldHeight-1)
+            return false;
+        if (fieldValues[vecPlayerPosition.y+1][vecPlayerPosition.x]==enBlockType::Wall)
+            return false;
+        if (currentFieldValues[vecPlayerPosition.y+1][vecPlayerPosition.x]==enBlockType::Box)
+            if (currentFieldValues[vecPlayerPosition.y+2][vecPlayerPosition.x]==enBlockType::Box || fieldValues[vecPlayerPosition.y+2][vecPlayerPosition.x]==enBlockType::Wall)
+                return false;
+    }
+
+    return true;
+}
+
+void Game::unloadLevel()
+{
+    for(int i = 0; i < fieldHeight; i++)
+    {
+        for (int j=0; j<fieldWidth; j++)
+        {
+            delete gridSpritesGround[i][j];
+            delete gridSpritesWalls[i][j];
+            delete gridSpritesMoveable[i][j];
+        }
+    }
+
+    for(int i = 0; i < fieldHeight; i++)
+    {
+        delete gridSpritesGround[i];
+        delete gridSpritesWalls[i];
+        delete gridSpritesMoveable[i];
+        delete fieldValues[i];
+        delete currentFieldValues[i];
+    }
 }

@@ -4,10 +4,13 @@
 	<Game.h>
 	<Configuration.h>
 
-1566665911 c:\users\tom\programming\sokoban\include\game.h
+1566734767 c:\users\tom\programming\sokoban\include\game.h
 	<TGUI/TGUI.hpp>
 	<stdio.h>
 	<dirent.h>
+	<iostream>
+	<fstream>
+	<Configuration.h>
 
 1557776616 c:\users\tom\programming\tgui-0.8.5\include\tgui\tgui.hpp
 	<TGUI/Clipboard.hpp>
@@ -969,10 +972,10 @@
 1557779255 c:\users\tom\programming\sfml\sfml-2.5.1\include\sfml\main.hpp
 	<SFML/Config.hpp>
 
-1566645146 source:c:\users\tom\programming\sokoban\src\game.cpp
+1566734208 source:c:\users\tom\programming\sokoban\src\game.cpp
 	"Game.h"
 
-1566642037 source:c:\users\tom\programming\sokoban\src\configuration.cpp
+1566734736 source:c:\users\tom\programming\sokoban\src\configuration.cpp
 	"Configuration.h"
 
 1566641860 c:\users\tom\programming\sokoban\include\configuration.h

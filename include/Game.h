@@ -1,7 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 #include <TGUI/TGUI.hpp>
-
+#include <stdio.h>
+#include <dirent.h>
 class Game
 {
  public:
@@ -28,6 +29,11 @@ class Game
 
         tgui::Gui* gameMenu;
 
+        void initGame(std::string strLevelName);
+
+        void parseLevel(std::string strLevelName);
+
+        enum enBlockType {Empty, Wall, Box, Destination, Player};
 };
 
 #endif // GAME_H

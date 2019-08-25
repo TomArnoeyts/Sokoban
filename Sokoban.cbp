@@ -35,6 +35,8 @@
 			<Add option="-fexceptions" />
 			<Add directory="../TGUI-0.8.5/include" />
 			<Add directory="../SFML/SFML-2.5.1/include" />
+			<Add directory="../thor-v2.0-sdk/include" />
+			<Add directory="../Aurora-master/include" />
 		</Compiler>
 		<Linker>
 			<Add library="../TGUI-0.8.5/buildcb/lib/libtgui.a" />
@@ -42,11 +44,15 @@
 			<Add library="../SFML/SFML-2.5.1/buildcb/lib/libsfml-graphics.a" />
 			<Add library="../SFML/SFML-2.5.1/buildcb/lib/libsfml-system.a" />
 			<Add library="../SFML/SFML-2.5.1/buildcb/lib/libsfml-window.a" />
+			<Add library="../thor-v2.0-sdk/buildcb/src/libthor.dll.a" />
 			<Add directory="../SFML/SFML-2.5.1/buildcb/lib" />
 			<Add directory="../TGUI-0.8.5/buildcb/lib" />
+			<Add directory="../thor-v2.0-sdk/buildcb/src" />
 		</Linker>
+		<Unit filename="include/Configuration.h" />
 		<Unit filename="include/Game.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/Configuration.cpp" />
 		<Unit filename="src/Game.cpp" />
 		<Extensions>
 			<code_completion />

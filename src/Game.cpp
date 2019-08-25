@@ -18,6 +18,36 @@ Game::~Game()
 void Game::createGui()
 {
     gameMenu->loadWidgetsFromFile("resources\\Menus\\MainMenu.txt");
+
+    struct dirent *entry = nullptr;
+    DIR *dp = nullptr;
+
+    dp = opendir("resources\\Levels\\E_Sokoban\\");
+    if (dp != nullptr) {
+        while ((entry = readdir(dp)))
+        {
+            std::string filename(entry->d_name);
+            std::string needle("ErimS");
+            std::size_t found = filename.find(needle);
+            if (found!=std::string::npos)
+                gameMenu->get<tgui::ListBox>("lstLevel")->addItem(entry->d_name);
+        }
+
+    }
+
+    closedir(dp);
+    gameMenu->get<tgui::ListBox>("lstLevel")->setSelectedItemByIndex(0);
+
+    gameMenu->get("btnStartGame")->connect("pressed", [&]()
+                                           {
+                                              initGame(gameMenu->get<tgui::ListBox>("lstLevel")->getSelectedItem().toAnsiString());
+                                           });
+
+    gameMenu->get<tgui::Button>("btnExitGame")->connect("pressed", [&]()
+                                                         {
+                                                            _window.close();
+                                                         }
+                                                         );
 }
 
 void Game::run(int frames_per_second)
@@ -99,4 +129,15 @@ void Game::render()
     }
 
     _window.display();
+}
+
+void Game::initGame(std::string strLevelName)
+{
+    _GameState=GameState::Playing;
+    parseLevel(strLevelName);
+}
+
+void Game::parseLevel(std::string strLevelName)
+{
+
 }
